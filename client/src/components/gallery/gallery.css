@@ -1,0 +1,6 @@
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 16px;
+  grid-auto-rows: 10px;
+}
