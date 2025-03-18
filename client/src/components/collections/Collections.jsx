@@ -1,5 +1,6 @@
 import Image from '../image/Image';
 import './collections.css';
+
 const Collections = () => {
   return (
     <div className='collections'>
