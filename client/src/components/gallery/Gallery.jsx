@@ -145,15 +145,17 @@ const items = [
   },
 ];
 
-const fetchPins = async ({ pageParam }) => {
-  const response = await axios.get(`/pins?cursor=${pageParam}`);
+const fetchPins = async ({ pageParam, search }) => {
+  const response = await axios.get(
+    `/pins?cursor=${pageParam}&search=${search || ''}`
+  );
   return response.data;
 };
 
-const Gallery = () => {
+const Gallery = ({ search }) => {
   const { data, fetchNextPage, hasNextPage, status } = useInfiniteQuery({
-    queryKey: ['pins'],
-    queryFn: fetchPins,
+    queryKey: ['pins', search],
+    queryFn: ({ pageParam = 0 }) => fetchPins({ pageParam, search }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   });
