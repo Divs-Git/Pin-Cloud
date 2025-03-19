@@ -10,9 +10,12 @@ import Auth from './pages/auth/Auth';
 import UserProfile from './pages/userProfile/UserProfile.jsx';
 import Search from './pages/search/Search.jsx';
 import MainLayout from './layouts/MainLayout.jsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
@@ -25,5 +28,5 @@ createRoot(document.getElementById('root')).render(
         <Route path='/auth' element={<Auth />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  </QueryClientProvider>
 );
