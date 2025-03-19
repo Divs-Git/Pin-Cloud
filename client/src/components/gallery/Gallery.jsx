@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import GalleryItem from '../galleryItem/GalleryItem';
 import './gallery.css';
 import axios from '../../api';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const items = [
   {
@@ -144,26 +145,38 @@ const items = [
   },
 ];
 
-const fetchPins = async () => {
-  const response = await axios.get('/pins');
+const fetchPins = async ({ pageParam }) => {
+  const response = await axios.get(`/pins?cursor=${pageParam}`);
   return response.data;
 };
 
 const Gallery = () => {
-  const { isPending, error, data } = useQuery({
+  const { data, fetchNextPage, hasNextPage, status } = useInfiniteQuery({
     queryKey: ['pins'],
     queryFn: fetchPins,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   });
 
-  if (error) return 'An error has occured: ' + error.message;
-  if (isPending) return 'Loading...';
+  if (status === 'error') return 'An error has occured';
+  if (status === 'pending') return 'Loading...';
 
   console.log(data);
+  const allPins = data?.pages.flatMap((page) => page.pins);
 
   return (
-    <div className='gallery'>
-      {data && data.map((item) => <GalleryItem key={item._id} item={item} />)}{' '}
-    </div>
+    <InfiniteScroll
+      dataLength={allPins.length}
+      next={fetchNextPage}
+      hasMore={!!hasNextPage}
+      loader={<h3>Loading more pins</h3>}
+      endMessage={<h3>All Posts loaded</h3>}
+    >
+      <div className='gallery'>
+        {allPins &&
+          allPins.map((item) => <GalleryItem key={item._id} item={item} />)}
+      </div>
+    </InfiniteScroll>
   );
 };
 
