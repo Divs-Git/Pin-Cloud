@@ -21,7 +21,7 @@ const seedDB = async () => {
       username: `user${i}`,
       email: `user${i}@example.com`,
       hashedPassword: hashedPassword,
-      img: `https://picsum.photos/id/${i}/200/200`,
+      image: `https://picsum.photos/id/${i}/200/200`,
     });
     users.push(await user.save());
   }
