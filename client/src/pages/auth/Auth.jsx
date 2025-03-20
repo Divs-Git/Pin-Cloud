@@ -3,12 +3,15 @@ import Image from '../../components/image/Image';
 import './auth.css';
 import axios from '../../api';
 import { useNavigate } from 'react-router';
+import useAuthStore from '../../store/authStore';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+
+  const { setCurrentUser } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +25,8 @@ const Auth = () => {
         `/users/auth/${isRegister ? 'register' : 'login'}`,
         data
       );
+
+      setCurrentUser(response.data);
 
       navigate('/');
     } catch (error) {
