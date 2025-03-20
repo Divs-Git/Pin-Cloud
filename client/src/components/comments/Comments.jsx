@@ -2,74 +2,35 @@ import { useState } from 'react';
 import Image from '../image/Image';
 import './comments.css';
 import EmojiPicker from 'emoji-picker-react';
+import { useQuery } from '@tanstack/react-query';
+import axios from './../../api/index';
+import Comment from './Comment';
 
-const Comments = () => {
+const Comments = ({ id }) => {
   const [open, setOpen] = useState(false);
+  const { isPending, error, data } = useQuery({
+    queryKey: ['comments', id],
+    queryFn: () => axios.get(`/comments/${id}`).then((res) => res.data),
+  });
+
+  if (error) return 'An error has occured';
+  if (isPending) return 'Loading...';
+
+  if (!data) return 'User not found...';
+
+  // console.log(data);
   return (
     <div className='comments'>
       <div className='commentList'>
-        <span className='commentCount'>6 comments</span>
+        <span className='commentCount'>
+          {data.length == 0 ? 'No comments' : data.length} comments
+        </span>
 
         {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
-        {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
-        {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
-        {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
-        {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
-        {/**COMMENT */}
-        <div className='comment'>
-          <Image path={'/general/noAvatar.png'} alt={''} />
-
-          <div className='commentContent'>
-            <span className='commentUsername'>Divyansh Srivastava</span>
-            <p className='commentText'>This is a very beautiful post image.</p>
-            <span className='commentTime'>2h</span>
-          </div>
-        </div>
+        {data &&
+          data.map((comment) => (
+            <Comment key={comment._id} comment={comment} />
+          ))}
       </div>
 
       <form className='commentForm'>

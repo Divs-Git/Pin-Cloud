@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router';
 import './post.css';
 import { useQuery } from '@tanstack/react-query';
 import axios from '../../api';
+
 const Post = () => {
   const { id } = useParams();
   const { isPending, error, data } = useQuery({
@@ -36,7 +37,7 @@ const Post = () => {
             <Image src={data.user.image || '/general/noAvatar.png'} />
             <span>{data.user.displayName}</span>
           </Link>
-          <Comments />
+          <Comments id={data._id} />
         </div>
       </div>
     </div>
