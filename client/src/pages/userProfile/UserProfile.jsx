@@ -2,21 +2,38 @@ import { useState } from 'react';
 import Image from './../../components/image/Image';
 import './userProfile.css';
 import Gallery from './../../components/gallery/Gallery';
-import Collections from '../../components/collections/Collections';
+import { useQuery } from '@tanstack/react-query';
+import axios from '../../api';
+import { useParams } from 'react-router';
+import Boards from '../../components/boards/Boards';
 
 const UserProfile = () => {
   const [type, setType] = useState('saved');
+
+  const { username } = useParams();
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ['profile', username],
+    queryFn: () => axios.get(`/users/${username}`).then((res) => res.data),
+  });
+
+  if (error) return 'An error has occured';
+  if (isPending) return 'Loading...';
+
+  if (!data) return 'User not found...';
+
+  // console.log(data);
   return (
     <div className='userProfile'>
       <Image
         className={'profileImage'}
         w={100}
         h={100}
-        path={'/general/noAvatar.png'}
+        path={data.image || '/general/noAvatar.png'}
         alt={''}
       />
-      <h1 className='profileName'>Divyash Srivastava</h1>
-      <span className='profileUsername'>@divyansh</span>
+      <h1 className='profileName'>{data.displayName}</h1>
+      <span className='profileUsername'>{data.username}</span>
       <div className='followCounts'>10 followers &#x2022; 20 followings </div>
       <div className='profileInteractions'>
         <Image path={'/general/share.svg'} alt={''} />
@@ -40,7 +57,11 @@ const UserProfile = () => {
           Saved
         </span>
       </div>
-      {type === 'created' ? <Gallery /> : <Collections />}
+      {type === 'created' ? (
+        <Gallery userId={data._id} />
+      ) : (
+        <Boards userId={data._id} />
+      )}
     </div>
   );
 };

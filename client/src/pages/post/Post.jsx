@@ -1,9 +1,22 @@
 import Comments from '../../components/comments/Comments';
 import PostInteractions from '../../components/postInteractions/PostInteractions';
 import Image from './../../components/image/Image';
-import { Link } from 'react-router';
+import { Link, useParams } from 'react-router';
 import './post.css';
+import { useQuery } from '@tanstack/react-query';
+import axios from '../../api';
 const Post = () => {
+  const { id } = useParams();
+  const { isPending, error, data } = useQuery({
+    queryKey: ['pin', id],
+    queryFn: () => axios.get(`/pins/${id}`).then((res) => res.data),
+  });
+
+  if (error) return 'An error has occured';
+  if (isPending) return 'Loading...';
+
+  if (!data) return 'Pin not found...';
+
   return (
     <div className='postPage'>
       <img
@@ -15,13 +28,13 @@ const Post = () => {
       />
       <div className='postContainer'>
         <div className='postImg'>
-          <Image path={'/pins/pin1.jpeg'} alt={''} w={736} />
+          <Image src={data.media} alt={''} w={736} />
         </div>
         <div className='postDetails'>
           <PostInteractions />
-          <Link to={'/divyansh'} className='postUser'>
-            <Image path={'/general/noAvatar.png'} />
-            <span>Divyansh Srivastava</span>
+          <Link to={`/${data.user.username}`} className='postUser'>
+            <Image src={data.user.image || '/general/noAvatar.png'} />
+            <span>{data.user.displayName}</span>
           </Link>
           <Comments />
         </div>
