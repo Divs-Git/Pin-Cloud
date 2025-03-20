@@ -2,10 +2,13 @@ import { useState } from 'react';
 import Image from '../../components/image/Image';
 import './auth.css';
 import axios from '../../api';
+import { useNavigate } from 'react-router';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +22,8 @@ const Auth = () => {
         `/users/auth/${isRegister ? 'register' : 'login'}`,
         data
       );
+
+      navigate('/');
     } catch (error) {
       setError(error.response.data.message);
     }

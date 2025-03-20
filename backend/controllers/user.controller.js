@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
 
 export const getUser = async (req, res) => {
   const { username } = req.params;
@@ -26,6 +27,14 @@ export const registerUser = async (req, res) => {
     hashedPassword: newHashedPassword,
   });
 
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY);
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
   const { hashedPassword, ...detailsWithPassword } = user.toObject();
 
   res.status(201).json(detailsWithPassword);
@@ -49,9 +58,20 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ message: 'Invalid email or password' });
   }
 
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY);
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
   const { hashedPassword, ...detailsWithPassword } = user.toObject();
 
   res.status(201).json(detailsWithPassword);
 };
 
-export const logoutUser = async (req, res) => {};
+export const logoutUser = async (req, res) => {
+  res.clearCookie('token');
+  return res.status(200).json({ message: 'Logout successfully' });
+};
