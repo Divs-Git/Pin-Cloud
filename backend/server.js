@@ -15,6 +15,8 @@ const clientURL =
     ? process.env.CLIENT_URL_PROD
     : process.env.CLIENT_URL_DEV;
 
+console.log(clientURL);
+
 app.use(
   cors({
     origin: clientURL,
