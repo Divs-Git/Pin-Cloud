@@ -47,6 +47,10 @@
   background-color: #e50829;
   color: white;
 }
+.profileButtons button:last-child:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
 .profileButtons button:last-child:hover {
   background-color: #c1012e;
