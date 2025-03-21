@@ -15,12 +15,12 @@ const Comments = ({ id }) => {
 
   if (!data) return 'User not found...';
 
-  // console.log(data);
+  console.log(data);
   return (
     <div className='comments'>
       <div className='commentList'>
         <span className='commentCount'>
-          {data.length == 0 ? 'No comments' : data.length} comments
+          {data.length == 0 ? 'No comments' : data.length + ' comments'}
         </span>
 
         {/**COMMENT */}
@@ -29,7 +29,7 @@ const Comments = ({ id }) => {
             <Comment key={comment._id} comment={comment} />
           ))}
       </div>
-      <CommentInput />
+      <CommentInput id={id} />
     </div>
   );
 };

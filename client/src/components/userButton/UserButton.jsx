@@ -6,9 +6,7 @@ import { Link, useNavigate } from 'react-router';
 import useAuthStore from '../../store/authStore';
 
 const UserButton = () => {
-  // Temp user
   const { currentUser, removeCurrentUser } = useAuthStore();
-  console.log(currentUser);
 
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
