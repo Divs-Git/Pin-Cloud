@@ -5,15 +5,23 @@ import commentRouter from './routes/comment.route.js';
 import boardRouter from './routes/board.route.js';
 import connectDB from './utils/connectDB.js';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(express.json());
+
+const clientURL =
+  process.env.NODE_ENV === 'production'
+    ? process.env.CLIENT_URL_PROD
+    : process.env.CLIENT_URL_DEV;
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: clientURL,
     credentials: true,
   })
 );
+app.use(cookieParser());
 
 // app.use('/api/test', (req, res) => {
 //   return res.json('Hello from backend');
