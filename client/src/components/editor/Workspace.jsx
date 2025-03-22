@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useEditorStore from '../../store/editorStore';
 import Image from '../image/Image';
 
 const Workspace = ({ previewImage }) => {
-  const { textOptions, setTextOptions, canvasOptions, setCanvasOptions } =
-    useEditorStore();
+  const {
+    setSelectedLayer,
+    textOptions,
+    setTextOptions,
+    canvasOptions,
+    setCanvasOptions,
+  } = useEditorStore();
 
   useEffect(() => {
     if (canvasOptions.height === 0) {
@@ -17,6 +22,41 @@ const Workspace = ({ previewImage }) => {
       });
     }
   }, [previewImage, canvasOptions, setCanvasOptions]);
+
+  const itemRef = useRef(null);
+  const itemContainer = useRef(null);
+  const isDragging = useRef(false);
+  const offset = useRef({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    setSelectedLayer('text');
+    isDragging.current = true;
+    offset.current = {
+      x: e.clientX - textOptions.left,
+      y: e.clientY - textOptions.top,
+    };
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current) {
+      return;
+    }
+
+    setTextOptions({
+      ...textOptions,
+      left: e.clientX - offset.current.x,
+      top: e.clientY - offset.current.y,
+    });
+  };
+
+  const handleMouseLeave = (e) => {
+    isDragging.current = false;
+  };
+
+  const handleMouseUp = (e) => {
+    isDragging.current = false;
+  };
+
   return (
     <div className='workspace'>
       <div
@@ -25,6 +65,10 @@ const Workspace = ({ previewImage }) => {
           height: canvasOptions.height,
           backgroundColor: canvasOptions.backgroundColor,
         }}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        ref={itemContainer}
       >
         <img src={previewImage.url} alt='' />
         {textOptions.text && (
@@ -35,6 +79,8 @@ const Workspace = ({ previewImage }) => {
               top: textOptions.top,
               fontSize: `${textOptions.fontSize}px`,
             }}
+            onMouseDown={handleMouseDown}
+            ref={itemRef}
           >
             <input
               type='text'
