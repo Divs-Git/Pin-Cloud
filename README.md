@@ -34,5 +34,8 @@ A full-stack social media platform built with **React** and **Node.js** that all
 - Fast loading and smooth interactions
 
 
-💡 Built with ❤️ by Divyansh Srivastava
-You can save this as `README.md` in your project folder. Let me know if you want to modify anything! 😎
+💡 Built with ❤️ by [Divyansh Srivastava](https://github.com/Divs-Git)
+
+---
+
+Let me know if you need to update anything! 😎
