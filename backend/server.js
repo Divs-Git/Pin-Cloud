@@ -6,6 +6,7 @@ import boardRouter from './routes/board.route.js';
 import connectDB from './utils/connectDB.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
 
 const app = express();
 app.use(express.json());
@@ -15,8 +16,6 @@ const clientURL =
     ? process.env.CLIENT_URL_PROD
     : process.env.CLIENT_URL_DEV;
 
-console.log(clientURL);
-
 app.use(
   cors({
     origin: clientURL,
@@ -24,6 +23,7 @@ app.use(
   })
 );
 app.use(cookieParser());
+app.use(fileUpload());
 
 // app.use('/api/test', (req, res) => {
 //   return res.json('Hello from backend');
