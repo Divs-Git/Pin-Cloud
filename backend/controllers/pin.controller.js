@@ -1,8 +1,12 @@
 import Pin from '../models/pin.model.js';
 import User from '../models/user.model.js';
 import sharp from 'sharp';
-import ImageKit from 'imagekit';
+import Imagekit from 'imagekit';
 import { response } from 'express';
+import Like from '../models/like.model.js';
+import jwt from 'jsonwebtoken';
+import Save from '../models/save.model.js';
+import Board from '../models/board.model.js';
 
 export const getPins = async (req, res) => {
   const pageNumber = Number(req.query.cursor) || 0;
@@ -46,47 +50,134 @@ export const getPin = async (req, res) => {
   res.status(200).json(pin);
 };
 
+export const interactionCheck = async (req, res) => {
+  const { id } = req.params;
+  const token = req.cookies.token;
+
+  const likeCount = await Like.countDocuments({ pin: id });
+
+  if (!token) {
+    return res.status(200).json({ likeCount, isLiked: false, isSaved: false });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
+    if (err) {
+      return res
+        .status(200)
+        .json({ likeCount, isLiked: false, isSaved: false });
+    }
+
+    const userId = payload.userId;
+
+    const isLiked = await Like.findOne({
+      user: userId,
+      pin: id,
+    });
+
+    const isSaved = await Save.findOne({
+      user: userId,
+      pin: id,
+    });
+
+    res.status(200).json({
+      likeCount,
+      isLiked: isLiked ? true : false,
+      isSaved: isSaved ? true : false,
+    });
+  });
+};
+
+export const interact = async (req, res) => {
+  const { id } = req.params;
+
+  const { type } = req.body;
+
+  if (type == 'like') {
+    const isLiked = await Like.findOne({
+      user: req.userId,
+      pin: id,
+    });
+
+    if (isLiked) {
+      await Like.deleteOne({
+        user: req.userId,
+        pin: id,
+      });
+    } else {
+      await Like.create({
+        user: req.userId,
+        pin: id,
+      });
+    }
+  } else {
+    const isSaved = await Save.findOne({
+      user: req.userId,
+      pin: id,
+    });
+
+    if (isSaved) {
+      await Save.deleteOne({
+        user: req.userId,
+        pin: id,
+      });
+    } else {
+      await Save.create({
+        user: req.userId,
+        pin: id,
+      });
+    }
+  }
+
+  res.status(200).json({
+    message: 'Successfull',
+  });
+};
+
 export const createPin = async (req, res) => {
-  const { title, description, link, board, tags, textOptions, canvasOptions } =
-    req.body;
+  const {
+    title,
+    description,
+    link,
+    board,
+    tags,
+    textOptions,
+    canvasOptions,
+    newBoard,
+  } = req.body;
 
-  const file = req.files.file;
+  const media = req.files.file;
 
-  if (!title || !description || !file) {
-    res.status(400).json({ message: 'Please enter all fields.' });
+  if ((!title, !description, !media)) {
+    return res.status(400).json({ message: 'All fields are required!' });
   }
 
   const parsedTextOptions = JSON.parse(textOptions || '{}');
-  const parsedCanavasOptions = JSON.parse(canvasOptions || '{}');
+  const parsedCanvasOptions = JSON.parse(canvasOptions || '{}');
 
-  // console.log(title, description, link, board, tags);
-  // console.dir(file);
-  // console.dir(parsedTextOptions);
-  // console.dir(parsedCanavasOptions);
+  const metadata = await sharp(media.data).metadata();
 
-  const metaData = await sharp(file.data).metadata();
   const originalOrientation =
-    metaData.width < metaData.height ? 'portrait' : 'landscape';
-  const originalAspectRatio = metaData.width / metaData.height;
+    metadata.width < metadata.height ? 'portrait' : 'landscape';
+  const originalAspectRatio = metadata.width / metadata.height;
 
   let clientAspectRatio;
   let width;
   let height;
 
-  if (parsedCanavasOptions.size != 'original') {
+  if (parsedCanvasOptions.size !== 'original') {
     clientAspectRatio =
-      parsedCanavasOptions.size.split(':')[0] /
-      parsedCanavasOptions.size.split(':')[1];
+      parsedCanvasOptions.size.split(':')[0] /
+      parsedCanvasOptions.size.split(':')[1];
   } else {
-    parsedCanavasOptions.orientation = originalOrientation
+    parsedCanvasOptions.orientation === originalOrientation
       ? (clientAspectRatio = originalOrientation)
       : (clientAspectRatio = 1 / originalAspectRatio);
   }
 
-  width = metaData.width;
-  height = metaData.width / clientAspectRatio;
+  width = metadata.width;
+  height = metadata.width / clientAspectRatio;
 
-  const imageKit = new ImageKit({
+  const imagekit = new Imagekit({
     publicKey: process.env.IK_PUBLIC_KEY,
     privateKey: process.env.IK_PRIVATE_KEY,
     urlEndpoint: process.env.IK_URL_ENDPOINT,
@@ -94,54 +185,63 @@ export const createPin = async (req, res) => {
 
   const textLeftPosition = Math.round((parsedTextOptions.left * width) / 375);
   const textTopPosition = Math.round(
-    (parsedTextOptions.top * height) / parsedCanavasOptions.height
+    (parsedTextOptions.top * height) / parsedCanvasOptions.height
   );
 
   let croppingStrategy = '';
 
-  if (parsedCanavasOptions.size !== 'original') {
+  if (parsedCanvasOptions.size !== 'original') {
     if (originalAspectRatio > clientAspectRatio) {
       croppingStrategy = ',cm-pad_resize';
     }
   } else {
     if (
       originalOrientation === 'landscape' &&
-      parsedCanavasOptions.orientation === 'portrait'
+      parsedCanvasOptions.orientation === 'portrait'
     ) {
       croppingStrategy = ',cm-pad_resize';
     }
   }
 
-  const transformationString = `w-${width},h-${height}${croppingStrategy},bg-${parsedCanavasOptions.backgroundColor.substring(
+  const transformationString = `w-${width},h-${height}${croppingStrategy},bg-${parsedCanvasOptions.backgroundColor.substring(
     1
   )}${
     parsedTextOptions.text
       ? `,l-text,i-${parsedTextOptions.text},fs-${
-          parsedTextOptions.fontSize * 2
+          parsedTextOptions.fontSize * 2.1
         },lx-${textLeftPosition},ly-${textTopPosition},co-${parsedTextOptions.color.substring(
           1
         )},l-end`
       : ''
   }`;
 
-  imageKit
+  imagekit
     .upload({
-      file: file.data,
-      fileName: file.name,
+      file: media.data,
+      fileName: media.name,
       folder: 'pins',
       transformation: {
         pre: transformationString,
       },
     })
     .then(async (response) => {
-      // console.dir(response);
+      let newBoardId;
+
+      if (newBoard) {
+        const res = await Board.create({
+          title: newBoard,
+          user: req.userId,
+        });
+        newBoardId = res._id;
+      }
+
       const newPin = await Pin.create({
         user: req.userId,
         title,
         description,
-        link: link || '',
-        board: link || null,
-        tags: tags ? tags.split(',').map((tag) => tag.trim()) : {},
+        link: link || null,
+        board: newBoardId || board || null,
+        tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
         media: response.filePath,
         width: response.width,
         height: response.height,

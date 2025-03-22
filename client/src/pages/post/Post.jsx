@@ -20,19 +20,21 @@ const Post = () => {
 
   return (
     <div className='postPage'>
-      <img
-        width='20'
-        height='20'
-        src='https://img.icons8.com/ios-filled/50/left.png'
-        alt='left'
-        style={{ cursor: 'pointer' }}
-      />
+      <Link to={'/'}>
+        <img
+          width='20'
+          height='20'
+          src='https://img.icons8.com/ios-filled/50/left.png'
+          alt='left'
+          style={{ cursor: 'pointer' }}
+        />
+      </Link>
       <div className='postContainer'>
         <div className='postImg'>
           <Image path={data.media} alt={''} w={736} />
         </div>
         <div className='postDetails'>
-          <PostInteractions />
+          <PostInteractions postId={id} />
           <Link to={`/${data.user.username}`} className='postUser'>
             <Image path={data.user.image || '/general/noAvatar.png'} />
             <span>{data.user.displayName}</span>

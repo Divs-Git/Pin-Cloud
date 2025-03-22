@@ -1,25 +1,35 @@
-import IKmage from '../../components/image/Image';
-import './create.css';
-import useAuthStore from './../../store/authStore';
 import { useNavigate } from 'react-router';
+import axios from '../../api';
+import useAuthStore from './../../store/authStore';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import Editor from '../../components/editor/Editor';
 import useEditorStore from '../../store/editorStore';
-import axios from './../../api/index';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import Editor from './../../components/editor/Editor';
+import { IKImage } from 'imagekitio-react';
+import BoardForm from './BoardForm';
 
-const Create = () => {
+// FIXED: CHANGE DIRECT REQUEST TO MUTATION
+const addPost = async (post) => {
+  const res = await axios.post('/pins', post);
+  return res.data;
+};
+
+const CreatePage = () => {
   const { currentUser } = useAuthStore();
   const navigate = useNavigate();
   const formRef = useRef();
-  const { textOptions, canvasOptions } = useEditorStore();
+  const { textOptions, canvasOptions, resetStore } = useEditorStore();
 
   const [file, setFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState({
+  const [previewImg, setPreviewImg] = useState({
     url: '',
     width: 0,
     height: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
+  // FIXED: ADD NEW BOARD
+  const [newBoard, setNewBoard] = useState('');
+  const [isNewBoardOpen, setIsNewBoardOpen] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -29,70 +39,91 @@ const Create = () => {
 
   useEffect(() => {
     if (file) {
-      const image = new Image();
-      image.src = URL.createObjectURL(file);
-      image.onload = () => {
-        setPreviewImage({
-          url: image.src,
-          width: image.width,
-          height: image.height,
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        setPreviewImg({
+          url: URL.createObjectURL(file),
+          width: img.width,
+          height: img.height,
         });
       };
     }
   }, [file]);
 
-  const previewImageURL = file ? URL.createObjectURL(file) : null;
+  // FIXED: CHANGE DIRECT REQUEST TO MUTATION
+  const mutation = useMutation({
+    mutationFn: addPost,
+    onSuccess: (data) => {
+      resetStore();
+      navigate(`/pin/${data._id}`);
+    },
+  });
 
   const handleSubmit = async () => {
     if (isEditing) {
       setIsEditing(false);
     } else {
       const formData = new FormData(formRef.current);
-      formData.append('file', file);
+      formData.append('media', file);
       formData.append('textOptions', JSON.stringify(textOptions));
       formData.append('canvasOptions', JSON.stringify(canvasOptions));
+      // FIXED: ADD NEW BOARD
+      formData.append('newBoard', newBoard);
 
-      try {
-        const res = await axios.post('/pins', formData, {
-          headers: {
-            'Content-Type': 'mutlipart/form-data',
-          },
-        });
-        // console.log(res);
-        navigate(`/pin/${res.data._id}`);
-      } catch (error) {
-        console.log(error);
-      }
+      // FIXED: CHANGE DIRECT REQUEST TO MUTATION
+      // try {
+      //   const res = await apiRequest.post("/pins", formData, {
+      //     headers: {
+      //       "Content-Type": "multipart/form-data",
+      //     },
+      //   });
+      //   navigate(`/pin/${res.data._id}`)
+      // } catch (err) {
+      //   console.log(err);
+      // }
+      mutation.mutate(formData);
     }
+  };
+
+  // FIXED: FETCH EXISTING BOARDS
+  const { data, isPending, error } = useQuery({
+    queryKey: ['formBoards'],
+    queryFn: () => axios.get(`/boards`).then((res) => res.data),
+  });
+
+  // FIXED: ADD NEW BOARD
+  const handleNewBoard = () => {
+    setIsNewBoardOpen((prev) => !prev);
   };
 
   return (
     <div className='createPage'>
       <div className='createTop'>
-        <h1>{isEditing ? 'Edit' : 'Create'} Pin</h1>
+        <h1>{isEditing ? 'Design your Pin' : 'Create Pin'}</h1>
         <button onClick={handleSubmit}>{isEditing ? 'Done' : 'Publish'}</button>
       </div>
-
       {isEditing ? (
-        <Editor previewImage={previewImage} />
+        <Editor previewImg={previewImg} />
       ) : (
         <div className='createBottom'>
-          {previewImage.url ? (
+          {previewImg.url ? (
             <div className='preview'>
-              <img src={previewImage.url} />
+              <img src={previewImg.url} alt='' />
               <div className='editIcon' onClick={() => setIsEditing(true)}>
-                <IKmage path={'/general/edit.svg'} alt={''} />
+                <IKImage path='/general/edit.svg' alt='' />
               </div>
             </div>
           ) : (
             <Fragment>
               <label htmlFor='file' className='upload'>
                 <div className='uploadTitle'>
-                  <IKmage path={'/general/upload.svg'} alt={''} />
+                  <IKImage path='/general/upload.svg' alt='' />
                   <span>Choose a file</span>
                 </div>
                 <div className='uploadInfo'>
-                  We recommend using high quality .jpg files less than 200 MB.
+                  We recommend using high quality .jpg files less than 20 MB or
+                  .mp4 files less than 200 MB.
                 </div>
               </label>
               <input
@@ -113,18 +144,16 @@ const Create = () => {
                 id='title'
               />
             </div>
-
             <div className='createFormItem'>
               <label htmlFor='description'>Description</label>
               <textarea
                 rows={6}
                 type='text'
-                placeholder='Add a description'
+                placeholder='Add a detailed description'
                 name='description'
                 id='description'
               />
             </div>
-
             <div className='createFormItem'>
               <label htmlFor='link'>Link</label>
               <input
@@ -134,27 +163,56 @@ const Create = () => {
                 id='link'
               />
             </div>
-
-            <div className='createFormItem'>
-              <label htmlFor='board'>Board</label>
-              <select name='board' id='board'>
-                <option value={''}>Choose a board</option>
-                <option value={'1'}>Board 1</option>
-                <option value={'2'}>Board 2</option>
-                <option value={'3'}>Board 3</option>
+            {/* <div className="createFormItem">
+              <label htmlFor="board">Board</label>
+              <select name="board" id="board">
+                <option value="">Choose a board</option>
+                <option value="1">Board 1</option>
+                <option value="2">Board 2</option>
+                <option value="3">Board 3</option>
               </select>
-            </div>
-
+            </div> */}
+            {/* FIXED: SELECT OR ADD BOARD */}
+            {(!isPending || !error) && (
+              <div className='createFormItem'>
+                <label htmlFor='board'>Board</label>
+                <select name='board' id='board'>
+                  <option value=''>Choose a board</option>
+                  {data &&
+                    data.map((board) => (
+                      <option value={board._id} key={board._id}>
+                        {board.title}
+                      </option>
+                    ))}
+                </select>
+                <div className='newBoard'>
+                  {newBoard && (
+                    <div className='newBoardContainer'>
+                      <div className='newBoardItem'>{newBoard}</div>
+                    </div>
+                  )}
+                  <div className='createBoardButton' onClick={handleNewBoard}>
+                    Create new board
+                  </div>
+                </div>
+              </div>
+            )}
             <div className='createFormItem'>
               <label htmlFor='tags'>Tagged topics</label>
               <input type='text' placeholder='Add tags' name='tags' id='tags' />
               <small>Don&apos;t worry, people won&apos;t see your tags</small>
             </div>
           </form>
+          {isNewBoardOpen && (
+            <BoardForm
+              setIsNewBoardOpen={setIsNewBoardOpen}
+              setNewBoard={setNewBoard}
+            />
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export default Create;
+export default CreatePage;

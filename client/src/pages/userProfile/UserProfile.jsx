@@ -34,7 +34,7 @@ const UserProfile = () => {
         alt={''}
       />
       <h1 className='profileName'>{data.displayName}</h1>
-      <span className='profileUsername'>{data.username}</span>
+      <span className='profileUsername'>@{data.username}</span>
       <div className='followCounts'>
         {data.followerCount} followers &#x2022; {data.followingCount} followings
       </div>
