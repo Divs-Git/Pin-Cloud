@@ -23,14 +23,14 @@ const UserButton = () => {
 
   return currentUser ? (
     <div className='userButton'>
-      <Image src={currentUser.image || '/general/noAvatar.png'} />
+      <Image path={currentUser.image || '/general/noAvatar.png'} />
       <div onClick={() => setOpen((prev) => !prev)}>
         <Image path='/general/arrow.svg' className='arrow' />
       </div>
 
       {open && (
         <div className='userOptions'>
-          <Link to={`/profile/${currentUser.username}`} className='userOption'>
+          <Link to={`/${currentUser.username}`} className='userOption'>
             Profile
           </Link>
           <div className='userOption'>Settings</div>
