@@ -6,9 +6,9 @@ A full-stack social media platform built with **React** and **Node.js** that all
 🔗 [View the Demo](https://pin-cloud.vercel.app/)
 
 ## 🛠️ Tech Stack
-- **Frontend:** React, Zustand, Flexbox  
+- **Frontend:** React, Zustand  
 - **Backend:** Node.js, MongoDB, JWT  
-- **Deployment:** Vercel  
+- **Deployment:** Vercel,Render  
 
 ## 🌟 Features
 ✅ **User Authentication:**  
