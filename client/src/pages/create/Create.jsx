@@ -1,4 +1,4 @@
-import Image from '../../components/image/Image';
+import IKmage from '../../components/image/Image';
 import './create.css';
 import useAuthStore from './../../store/authStore';
 import { useNavigate } from 'react-router';
@@ -10,6 +10,11 @@ const Create = () => {
   const navigate = useNavigate();
 
   const [file, setFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState({
+    url: '',
+    width: 0,
+    height: 0,
+  });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -17,6 +22,20 @@ const Create = () => {
       navigate('/auth');
     }
   }, [navigate, currentUser]);
+
+  useEffect(() => {
+    if (file) {
+      const image = new Image();
+      image.src = URL.createObjectURL(file);
+      image.onload = () => {
+        setPreviewImage({
+          url: image.src,
+          width: image.width,
+          height: image.height,
+        });
+      };
+    }
+  }, [file]);
 
   const previewImageURL = file ? URL.createObjectURL(file) : null;
 
@@ -28,21 +47,21 @@ const Create = () => {
       </div>
 
       {isEditing ? (
-        <Editor />
+        <Editor previewImage={previewImage} />
       ) : (
         <div className='createBottom'>
-          {previewImageURL ? (
+          {previewImage.url ? (
             <div className='preview'>
-              <img src={previewImageURL} />
+              <img src={previewImage.url} />
               <div className='editIcon' onClick={() => setIsEditing(true)}>
-                <Image path={'/general/edit.svg'} alt={''} />
+                <IKmage path={'/general/edit.svg'} alt={''} />
               </div>
             </div>
           ) : (
             <Fragment>
               <label htmlFor='file' className='upload'>
                 <div className='uploadTitle'>
-                  <Image path={'/general/upload.svg'} alt={''} />
+                  <IKmage path={'/general/upload.svg'} alt={''} />
                   <span>Choose a file</span>
                 </div>
                 <div className='uploadInfo'>
