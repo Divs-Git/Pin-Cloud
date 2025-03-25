@@ -1,18 +1,23 @@
 import EmojiPicker from 'emoji-picker-react';
-import React, { useState } from 'react';
-import axios from './../../api/index';
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axiosInstance from '../../api';
 
-const CommentInput = ({ id }) => {
+const addComment = async (comment) => {
+  const res = await axiosInstance.post('/comments', comment);
+  return res.data;
+};
+
+const CommentForm = ({ id }) => {
   const [open, setOpen] = useState(false);
   const [desc, setDesc] = useState('');
 
-  const queryClient = useQueryClient();
-
-  const addComment = async (comment) => {
-    const res = await axios.post('/comments', comment);
-    return res.data;
+  const handleEmojiClick = (emoji) => {
+    setDesc((prev) => prev + ' ' + emoji.emoji);
+    setOpen(false);
   };
+
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: addComment,
@@ -32,23 +37,19 @@ const CommentInput = ({ id }) => {
     });
   };
 
-  const handleEmojiClick = ({ emoji }) => {
-    setDesc((prev) => prev + emoji);
-    setOpen(false);
-  };
   return (
     <form className='commentForm' onSubmit={handleSubmit}>
       <input
         type='text'
         placeholder='Add a comment'
-        value={desc}
         onChange={(e) => setDesc(e.target.value)}
+        value={desc}
       />
       <div className='emoji'>
         <div onClick={() => setOpen((prev) => !prev)}>😊</div>
         {open && (
           <div className='emojiPicker'>
-            <EmojiPicker onEmojiClick={handleEmojiClick} />
+            <EmojiPicker height={400} onEmojiClick={handleEmojiClick} />
           </div>
         )}
       </div>
@@ -56,4 +57,4 @@ const CommentInput = ({ id }) => {
   );
 };
 
-export default CommentInput;
+export default CommentForm;
