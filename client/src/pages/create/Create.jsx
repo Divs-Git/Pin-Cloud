@@ -1,16 +1,17 @@
+import './create.css';
+import IKImage from '../../components/image/Image';
+import axiosInstance from '../../api';
+import useAuthStore from '../../stores/authStore';
 import { useNavigate } from 'react-router';
-import axios from '../../api';
-import useAuthStore from './../../store/authStore';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import useEditorStore from '../../store/editorStore';
+import useEditorStore from './../../stores/editorStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Editor from './../../components/editor/Editor';
-import { IKImage } from 'imagekitio-react';
-import BoardForm from './BoardForm';
+import BoardForm from './../create/BoardForm';
 
 // FIXED: CHANGE DIRECT REQUEST TO MUTATION
 const addPost = async (post) => {
-  const res = await axios.post('/pins', post);
+  const res = await axiosInstance.post('/pins', post);
   return res.data;
 };
 
@@ -89,7 +90,8 @@ const CreatePage = () => {
   // FIXED: FETCH EXISTING BOARDS
   const { data, isPending, error } = useQuery({
     queryKey: ['formBoards'],
-    queryFn: () => axios.get(`/boards`).then((res) => res.data),
+    queryFn: () =>
+      axiosInstance.get(`/boards/${currentUser._id}`).then((res) => res.data),
   });
 
   // FIXED: ADD NEW BOARD

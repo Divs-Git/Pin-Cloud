@@ -1,11 +1,8 @@
-import Gallery from '../../components/gallery/Gallery';
+import Gallery from '../../components/gallery/gallery';
+import './home.css';
 
-const Home = () => {
-  return (
-    <div>
-      <Gallery />
-    </div>
-  );
+const Homepage = () => {
+  return <Gallery />;
 };
 
-export default Home;
+export default Homepage;
