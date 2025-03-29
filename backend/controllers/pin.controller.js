@@ -1,11 +1,11 @@
-import Pin from "../models/pin.model.js";
-import User from "../models/user.model.js";
-import Like from "../models/like.model.js";
-import Save from "../models/save.model.js";
-import Board from "../models/board.model.js";
-import sharp from "sharp";
-import Imagekit from "imagekit";
-import jwt from "jsonwebtoken";
+import Pin from '../models/pin.model.js';
+import User from '../models/user.model.js';
+import Like from '../models/like.model.js';
+import Save from '../models/save.model.js';
+import Board from '../models/board.model.js';
+import sharp from 'sharp';
+import Imagekit from 'imagekit';
+import jwt from 'jsonwebtoken';
 
 export const getPins = async (req, res) => {
   const pageNumber = Number(req.query.cursor) || 0;
@@ -18,7 +18,7 @@ export const getPins = async (req, res) => {
     search
       ? {
           $or: [
-            { title: { $regex: search, $options: "i" } },
+            { title: { $regex: search, $options: 'i' } },
             { tags: { $in: [search] } },
           ],
         }
@@ -43,8 +43,8 @@ export const getPins = async (req, res) => {
 export const getPin = async (req, res) => {
   const { id } = req.params;
   const pin = await Pin.findById(id).populate(
-    "user",
-    "username img displayName"
+    'user',
+    'username img displayName'
   );
 
   console.log(pin);
@@ -66,26 +66,26 @@ export const createPin = async (req, res) => {
   const media = req.files.media;
 
   if ((!title, !description, !media)) {
-    return res.status(400).json({ message: "All fields are required!" });
+    return res.status(400).json({ message: 'All fields are required!' });
   }
 
-  const parsedTextOptions = JSON.parse(textOptions || "{}");
-  const parsedCanvasOptions = JSON.parse(canvasOptions || "{}");
+  const parsedTextOptions = JSON.parse(textOptions || '{}');
+  const parsedCanvasOptions = JSON.parse(canvasOptions || '{}');
 
   const metadata = await sharp(media.data).metadata();
 
   const originalOrientation =
-    metadata.width < metadata.height ? "portrait" : "landscape";
+    metadata.width < metadata.height ? 'portrait' : 'landscape';
   const originalAspectRatio = metadata.width / metadata.height;
 
   let clientAspectRatio;
   let width;
   let height;
 
-  if (parsedCanvasOptions.size !== "original") {
+  if (parsedCanvasOptions.size !== 'original') {
     clientAspectRatio =
-      parsedCanvasOptions.size.split(":")[0] /
-      parsedCanvasOptions.size.split(":")[1];
+      parsedCanvasOptions.size.split(':')[0] /
+      parsedCanvasOptions.size.split(':')[1];
   } else {
     parsedCanvasOptions.orientation === originalOrientation
       ? (clientAspectRatio = originalOrientation)
@@ -106,32 +106,18 @@ export const createPin = async (req, res) => {
     (parsedTextOptions.top * height) / parsedCanvasOptions.height
   );
 
-  // const transformationString = `w-${width},h-${height}${
-  //   originalAspectRatio > clientAspectRatio ? ",cm-pad_resize" : ""
-  // },bg-${parsedCanvasOptions.backgroundColor.substring(1)}${
-  //   parsedTextOptions.text
-  //     ? `,l-text,i-${parsedTextOptions.text},fs-${
-  //         parsedTextOptions.fontSize * 2.1
-  //       },lx-${textLeftPosition},ly-${textTopPosition},co-${parsedTextOptions.color.substring(
-  //         1
-  //       )},l-end`
-  //     : ""
-  // }`;
+  let croppingStrategy = '';
 
-  // FIXED TRANSFORMATION STRING
-
-  let croppingStrategy = "";
-
-  if (parsedCanvasOptions.size !== "original") {
+  if (parsedCanvasOptions.size !== 'original') {
     if (originalAspectRatio > clientAspectRatio) {
-      croppingStrategy = ",cm-pad_resize";
+      croppingStrategy = ',cm-pad_resize';
     }
   } else {
     if (
-      originalOrientation === "landscape" &&
-      parsedCanvasOptions.orientation === "portrait"
+      originalOrientation === 'landscape' &&
+      parsedCanvasOptions.orientation === 'portrait'
     ) {
-      croppingStrategy = ",cm-pad_resize";
+      croppingStrategy = ',cm-pad_resize';
     }
   }
 
@@ -144,14 +130,14 @@ export const createPin = async (req, res) => {
         },lx-${textLeftPosition},ly-${textTopPosition},co-${parsedTextOptions.color.substring(
           1
         )},l-end`
-      : ""
+      : ''
   }`;
 
   imagekit
     .upload({
       file: media.data,
       fileName: media.name,
-      folder: "test",
+      folder: 'test',
       transformation: {
         pre: transformationString,
       },
@@ -174,7 +160,7 @@ export const createPin = async (req, res) => {
         description,
         link: link || null,
         board: newBoardId || board || null,
-        tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+        tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
         media: response.filePath,
         width: response.width,
         height: response.height,
@@ -228,7 +214,7 @@ export const interact = async (req, res) => {
 
   const { type } = req.body;
 
-  if (type === "like") {
+  if (type === 'like') {
     const isLiked = await Like.findOne({
       pin: id,
       user: req.userId,
@@ -264,5 +250,5 @@ export const interact = async (req, res) => {
     }
   }
 
-  return res.status(200).json({ message: "Successful" });
+  return res.status(200).json({ message: 'Successful' });
 };
