@@ -1,11 +1,11 @@
-.userProfile {
+.profilePage {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
 }
 
-.profileImage {
+.profileImg {
   border-radius: 50%;
   object-fit: cover;
 }
@@ -47,14 +47,14 @@
   background-color: #e50829;
   color: white;
 }
+
 .profileButtons button:last-child:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
 .profileButtons button:last-child:hover {
-  background-color: #c1012e;
-  color: white;
+  background-color: #c1011e;
 }
 
 .profileOptions {
@@ -67,7 +67,7 @@
 
 .profileOptions span {
   cursor: pointer;
-  padding: 8px 0;
+  padding: 8px 0px;
 }
 
 .profileOptions span:hover {

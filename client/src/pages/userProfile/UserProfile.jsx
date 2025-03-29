@@ -1,45 +1,46 @@
 import { useState } from 'react';
-import Image from './../../components/image/Image';
 import './userProfile.css';
-import Gallery from './../../components/gallery/Gallery';
-import { useQuery } from '@tanstack/react-query';
-import axios from '../../api';
 import { useParams } from 'react-router';
-import Boards from '../../components/boards/Boards';
-import FollowButton from './FollowButton';
+import { useQuery } from '@tanstack/react-query';
+import axiosInstance from '../../api';
+import Image from '../../components/image/Image';
+import FollowButton from './../userProfile/FollowButton';
+import Gallery from '../../components/gallery/gallery';
+import Boards from './../../components/boards/Board';
 
-const UserProfile = () => {
+const ProfilePage = () => {
   const [type, setType] = useState('saved');
 
   const { username } = useParams();
 
   const { isPending, error, data } = useQuery({
     queryKey: ['profile', username],
-    queryFn: () => axios.get(`/users/${username}`).then((res) => res.data),
+    queryFn: () =>
+      axiosInstance.get(`/users/${username}`).then((res) => res.data),
   });
 
-  if (error) return 'An error has occured';
   if (isPending) return 'Loading...';
 
-  if (!data) return 'User not found...';
+  if (error) return 'An error has occurred: ' + error.message;
 
-  // console.log(data);
+  if (!data) return 'User not found!';
+
   return (
-    <div className='userProfile'>
+    <div className='profilePage'>
       <Image
-        className={'profileImage'}
+        className='profileImg'
         w={100}
         h={100}
-        path={data.image || '/general/noAvatar.png'}
-        alt={''}
+        path={data.img || '/general/noAvatar.png'}
+        alt=''
       />
       <h1 className='profileName'>{data.displayName}</h1>
       <span className='profileUsername'>@{data.username}</span>
       <div className='followCounts'>
-        {data.followerCount} followers &#x2022; {data.followingCount} followings
+        {data.followerCount} followers · {data.followingCount} followings
       </div>
       <div className='profileInteractions'>
-        <Image path={'/general/share.svg'} alt={''} />
+        <Image path='/general/share.svg' alt='' />
         <div className='profileButtons'>
           <button>Message</button>
           <FollowButton
@@ -47,18 +48,18 @@ const UserProfile = () => {
             username={data.username}
           />
         </div>
-        <Image path={'/general/more.svg'} alt={''} />
+        <Image path='/general/more.svg' alt='' />
       </div>
       <div className='profileOptions'>
         <span
           onClick={() => setType('created')}
-          className={type == 'created' ? 'active' : ''}
+          className={type === 'created' ? 'active' : ''}
         >
           Created
         </span>
         <span
           onClick={() => setType('saved')}
-          className={type == 'saved' ? 'active' : ''}
+          className={type === 'saved' ? 'active' : ''}
         >
           Saved
         </span>
@@ -72,4 +73,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default ProfilePage;
