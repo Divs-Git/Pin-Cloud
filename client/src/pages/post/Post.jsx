@@ -1,42 +1,47 @@
-import Comments from '../../components/comments/Comments';
-import PostInteractions from '../../components/postInteractions/PostInteractions';
-import Image from './../../components/image/Image';
 import { Link, useParams } from 'react-router';
 import './post.css';
 import { useQuery } from '@tanstack/react-query';
-import axios from '../../api';
+import axiosInstance from '../../api';
+import Image from '../../components/image/Image';
+import PostInteractions from './../../components/postInteractions/PostInteractions';
+import Comments from './../../components/comments/Comments';
 
-const Post = () => {
+const PostPage = () => {
   const { id } = useParams();
+
   const { isPending, error, data } = useQuery({
     queryKey: ['pin', id],
-    queryFn: () => axios.get(`/pins/${id}`).then((res) => res.data),
+    queryFn: () => axiosInstance.get(`/pins/${id}`).then((res) => res.data),
   });
 
-  if (error) return 'An error has occured';
   if (isPending) return 'Loading...';
 
-  if (!data) return 'Pin not found...';
+  if (error) return 'An error has occurred: ' + error.message;
+
+  if (!data) return 'Pin not found!';
+
+  console.log(data);
 
   return (
     <div className='postPage'>
       <Link to={'/'}>
-        <img
-          width='20'
+        <svg
           height='20'
-          src='https://img.icons8.com/ios-filled/50/left.png'
-          alt='left'
+          viewBox='0 0 24 24'
+          width='20'
           style={{ cursor: 'pointer' }}
-        />
+        >
+          <path d='M8.41 4.59a2 2 0 1 1 2.83 2.82L8.66 10H21a2 2 0 0 1 0 4H8.66l2.58 2.59a2 2 0 1 1-2.82 2.82L1 12z'></path>
+        </svg>
       </Link>
       <div className='postContainer'>
         <div className='postImg'>
-          <Image path={data.media} alt={''} w={736} />
+          <Image path={data.media} alt='' w={736} />
         </div>
         <div className='postDetails'>
           <PostInteractions postId={id} />
           <Link to={`/${data.user.username}`} className='postUser'>
-            <Image path={data.user.image || '/general/noAvatar.png'} />
+            <Image path={data.user.img || '/general/noAvatar.png'} />
             <span>{data.user.displayName}</span>
           </Link>
           <Comments id={data._id} />
@@ -46,4 +51,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default PostPage;

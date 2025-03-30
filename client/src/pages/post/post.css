@@ -5,8 +5,8 @@
 }
 
 .postContainer {
-  max-height: 820px;
   width: 70%;
+  max-height: 820px;
   display: flex;
   border: 1px solid #e9e9e9;
   border-radius: 32px;
@@ -14,14 +14,17 @@
 }
 
 .postImg {
+  /* FIXED: IMAGE */
   flex: 1;
-  background-color: #c0a68c;
+  background-color: #c8bcaf;
 }
 
 .postImg img {
   width: 100%;
   height: 100%;
+  /* FIXED: IMAGE */
   object-fit: cover;
+  object-fit: contain;
 }
 
 .postDetails {
@@ -50,13 +53,12 @@
   font-size: 14px;
 }
 
-@media (max-width: 1124px) {
+@media (max-width: 1127px) {
   .postContainer {
     width: 100%;
     margin-right: 16px;
   }
 }
-
 @media (max-width: 751px) {
   .postContainer {
     flex-direction: column;
