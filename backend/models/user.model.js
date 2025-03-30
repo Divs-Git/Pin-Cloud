@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import mongoose from 'mongoose';
+import { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new Schema(
   {
@@ -15,17 +15,15 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    image: {
+    img: {
       type: String,
     },
     hashedPassword: {
       type: String,
       required: true,
-    },
+    }
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model("User",userSchema)

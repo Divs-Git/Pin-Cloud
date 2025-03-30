@@ -1,5 +1,5 @@
-import { Schema } from 'mongoose';
-import mongoose from 'mongoose';
+import { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 const pinSchema = new Schema(
   {
@@ -28,20 +28,18 @@ const pinSchema = new Schema(
     },
     board: {
       type: Schema.Types.ObjectId,
-      ref: 'Board',
+      ref: "Board",
     },
     tags: {
       type: [String],
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model('Pin', pinSchema);
+export default mongoose.model("Pin", pinSchema);
