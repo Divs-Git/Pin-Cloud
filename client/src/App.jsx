@@ -1,5 +1,5 @@
 import './app.css';
-import Gallery from './components/gallery/Gallery';
+import Gallery from './components/gallery/gallery';
 import LeftBar from './components/leftBar/LeftBar';
 import TopBar from './components/topBar/TopBar';
 
