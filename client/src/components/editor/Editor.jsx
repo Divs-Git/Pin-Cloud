@@ -1,14 +1,14 @@
-import './editor.css';
-import Layers from './Layers';
-import Options from './Options';
-import Workspace from './Workspace';
+import "./editor.css";
+import Layers from "./Layers";
+import Options from "./Options";
+import Workspace from "./Workspace";
 
-const Editor = ({ previewImage }) => {
+const Editor = ({ previewImg }) => {
   return (
-    <div className='editor'>
-      <Layers previewImage={previewImage} />
-      <Workspace previewImage={previewImage} />
-      <Options previewImage={previewImage} />
+    <div className="editor">
+      <Layers previewImg={previewImg} />
+      <Workspace previewImg={previewImg} />
+      <Options previewImg={previewImg} />
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import React, { Fragment, useState } from 'react';
-import useEditorStore from '../../store/editorStore';
+import { Fragment, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
+import useEditorStore from '../../stores/editorStore';
 
 const portraitSizes = [
   {
@@ -68,7 +68,7 @@ const landscapeSizes = [
   },
 ];
 
-const Options = ({ previewImage }) => {
+const Options = ({ previewImg }) => {
   const {
     selectedLayer,
     textOptions,
@@ -76,19 +76,48 @@ const Options = ({ previewImage }) => {
     canvasOptions,
     setCanvasOptions,
   } = useEditorStore();
-  const [isColorpickerOpen, setIsColorpickerOpen] = useState(false);
+  const [isColorPickerOpen, setSetIsColorPickerOpen] = useState(false);
 
   const originalOrientation =
-    previewImage.width < previewImage.height ? 'portrait' : 'landscape';
+    previewImg.width < previewImg.height ? 'portrait' : 'landscape';
+
+  const handleOrientationClick = (orientation) => {
+    let newHeight;
+
+    if (
+      // FIXED: SHORTEN
+      // (originalOrientation === "portrait" && orientation === "portrait") ||
+      // (originalOrientation === "landscape" && orientation === "landscape")
+      originalOrientation === orientation
+    ) {
+      newHeight = (375 * previewImg.height) / previewImg.width;
+    } else {
+      newHeight = (375 * previewImg.width) / previewImg.height;
+    }
+
+    setCanvasOptions({
+      ...canvasOptions,
+      orientation,
+      size: 'original',
+      height: newHeight,
+    });
+  };
 
   const handleSizeClick = (size) => {
     let newHeight;
 
     if (size === 'original') {
-      if (originalOrientation === canvasOptions.orientation) {
-        newHeight = (375 * previewImage.height) / previewImage.width;
+      if (
+        // FIXED: SHORTEN
+        // (originalOrientation === "portrait" &&
+        //   canvasOptions.orientation === "portrait") ||
+        // (originalOrientation === "landscape" &&
+        //   canvasOptions.orientation === "landscape")
+        originalOrientation === canvasOptions.orientation
+      ) {
+        newHeight = (375 * previewImg.height) / previewImg.width;
       } else {
-        newHeight = (375 * previewImage.width) / previewImage.height;
+        newHeight = (375 * previewImg.width) / previewImg.height;
       }
     } else {
       newHeight = (375 * size.height) / size.width;
@@ -101,27 +130,10 @@ const Options = ({ previewImage }) => {
     });
   };
 
-  const handleOrientationClick = (orientation) => {
-    let newHeight;
-
-    if (originalOrientation === orientation) {
-      newHeight = (375 * previewImage.height) / previewImage.width;
-    } else {
-      newHeight = (375 * previewImage.width) / previewImage.height;
-    }
-
-    setCanvasOptions({
-      ...canvasOptions,
-      orientation,
-      size: 'original',
-      height: newHeight,
-    });
-  };
-
   return (
     <div className='options'>
       {selectedLayer === 'text' ? (
-        <div>
+        <div className=''>
           <div className='editingOption'>
             <span>Font Size</span>
             <input
@@ -138,24 +150,23 @@ const Options = ({ previewImage }) => {
               <div
                 className='colorPreview'
                 style={{ backgroundColor: textOptions.color }}
-                onClick={() => setIsColorpickerOpen((prev) => !prev)}
-              >
-                {isColorpickerOpen && (
-                  <div className='colorPicker'>
-                    <HexColorPicker
-                      color={textOptions.color}
-                      onChange={(color) =>
-                        setTextOptions({ ...textOptions, color })
-                      }
-                    />
-                  </div>
-                )}
-              </div>
+                onClick={() => setSetIsColorPickerOpen((prev) => !prev)}
+              />
+              {isColorPickerOpen && (
+                <div className='colorPicker'>
+                  <HexColorPicker
+                    color={textOptions.color}
+                    onChange={(color) =>
+                      setTextOptions({ ...textOptions, color })
+                    }
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
       ) : (
-        <div className='canvasOptions'>
+        <div className=''>
           <div className='editingOption'>
             <span>Orientation</span>
             <div className='orientations'>
@@ -177,7 +188,6 @@ const Options = ({ previewImage }) => {
               </div>
             </div>
           </div>
-
           <div className='editingOption'>
             <span>Size</span>
             <div className='sizes'>
@@ -222,18 +232,22 @@ const Options = ({ previewImage }) => {
           </div>
           <div className='editingOption'>
             <span>Background Color</span>
-            <div className='backgroundColor'>
-              <div
-                className='colorPreview'
-                style={{ backgroundColor: canvasOptions.backgroundColor }}
-                onClick={() => setIsColorpickerOpen((prev) => !prev)}
-              >
-                {isColorpickerOpen && (
+            <div className='bgColor'>
+              <div className='textColor'>
+                <div
+                  className='colorPreview'
+                  style={{ backgroundColor: canvasOptions.backgroundColor }}
+                  onClick={() => setSetIsColorPickerOpen((prev) => !prev)}
+                />
+                {isColorPickerOpen && (
                   <div className='colorPicker'>
                     <HexColorPicker
-                      color={textOptions.backgroundColor}
-                      onChange={(backgroundColor) =>
-                        setCanvasOptions({ ...canvasOptions, backgroundColor })
+                      color={canvasOptions.backgroundColor}
+                      onChange={(color) =>
+                        setCanvasOptions({
+                          ...canvasOptions,
+                          backgroundColor: color,
+                        })
                       }
                     />
                   </div>

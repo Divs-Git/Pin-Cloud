@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import useEditorStore from '../../store/editorStore';
+import { useEffect, useRef } from 'react';
 import Image from '../image/Image';
+import useEditorStore from '../../stores/editorStore';
 
-const Workspace = ({ previewImage }) => {
+const Workspace = ({ previewImg }) => {
   const {
     setSelectedLayer,
     textOptions,
@@ -13,7 +13,7 @@ const Workspace = ({ previewImage }) => {
 
   useEffect(() => {
     if (canvasOptions.height === 0) {
-      const canvasHeight = (375 * previewImage.height) / previewImage.width;
+      const canvasHeight = (375 * previewImg.height) / previewImg.width;
 
       setCanvasOptions({
         ...canvasOptions,
@@ -21,27 +21,15 @@ const Workspace = ({ previewImage }) => {
         orientation: canvasHeight > 375 ? 'portrait' : 'landscape',
       });
     }
-  }, [previewImage, canvasOptions, setCanvasOptions]);
+  }, [previewImg, canvasOptions, setCanvasOptions]);
 
   const itemRef = useRef(null);
-  const itemContainer = useRef(null);
-  const isDragging = useRef(false);
+  const containerRef = useRef(null);
+  const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
-    setSelectedLayer('text');
-    isDragging.current = true;
-    offset.current = {
-      x: e.clientX - textOptions.left,
-      y: e.clientY - textOptions.top,
-    };
-  };
-
   const handleMouseMove = (e) => {
-    if (!isDragging.current) {
-      return;
-    }
-
+    if (!dragging.current) return;
     setTextOptions({
       ...textOptions,
       left: e.clientX - offset.current.x,
@@ -49,12 +37,21 @@ const Workspace = ({ previewImage }) => {
     });
   };
 
-  const handleMouseLeave = (e) => {
-    isDragging.current = false;
+  const handleMouseUp = () => {
+    dragging.current = false;
   };
 
-  const handleMouseUp = (e) => {
-    isDragging.current = false;
+  const handleMouseLeave = () => {
+    dragging.current = false;
+  };
+
+  const handleMouseDown = (e) => {
+    setSelectedLayer('text');
+    dragging.current = true;
+    offset.current = {
+      x: e.clientX - textOptions.left,
+      y: e.clientY - textOptions.top,
+    };
   };
 
   return (
@@ -65,12 +62,12 @@ const Workspace = ({ previewImage }) => {
           height: canvasOptions.height,
           backgroundColor: canvasOptions.backgroundColor,
         }}
-        onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
-        ref={itemContainer}
+        ref={containerRef}
       >
-        <img src={previewImage.url} alt='' />
+        <img src={previewImg.url} alt='' />
         {textOptions.text && (
           <div
             className='text'
@@ -79,8 +76,8 @@ const Workspace = ({ previewImage }) => {
               top: textOptions.top,
               fontSize: `${textOptions.fontSize}px`,
             }}
-            onMouseDown={handleMouseDown}
             ref={itemRef}
+            onMouseDown={handleMouseDown}
           >
             <input
               type='text'
@@ -88,14 +85,15 @@ const Workspace = ({ previewImage }) => {
               onChange={(e) =>
                 setTextOptions({ ...textOptions, text: e.target.value })
               }
-              style={{ color: textOptions.color }}
+              style={{
+                color: textOptions.color,
+              }}
             />
-
             <div
-              className='deleteButton'
+              className='deleteTextButton'
               onClick={() => setTextOptions({ ...textOptions, text: '' })}
             >
-              <Image path={'/general/delete.svg'} />
+              <Image path='/general/delete.svg' alt='' />
             </div>
           </div>
         )}

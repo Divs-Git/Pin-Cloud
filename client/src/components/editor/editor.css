@@ -3,6 +3,8 @@
   gap: 16px;
 }
 
+/* LEFT */
+
 .layers {
   flex: 1;
   display: flex;
@@ -20,7 +22,6 @@
   font-size: 14px;
   color: gray;
   margin-top: 4px;
-  margin-bottom: 8px;
 }
 
 .layer {
@@ -52,7 +53,7 @@
   align-items: center;
   justify-content: center;
   background-color: #e9e9e9;
-  padding: 64px 0;
+  padding: 64px 0px;
 }
 
 .canvas {
@@ -67,7 +68,7 @@
 
 .text {
   position: absolute;
-  z-index: 1000;
+  z-index: 999;
   max-width: 100%;
   border: 1px dashed red;
 }
@@ -81,16 +82,16 @@
   width: 100%;
 }
 
-.deleteButton {
+.deleteTextButton {
   position: absolute;
-  top: 9px;
-  right: 7px;
+  top: -36px;
+  right: 0;
   background-color: white;
   width: 32px;
   height: 32px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
@@ -123,20 +124,20 @@
 }
 
 .textColor,
-.backgroundColor {
+.bgColor {
   position: relative;
 }
 
 .colorPreview {
-  height: 36px;
   width: 36px;
-  cursor: pointer;
+  height: 36px;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .colorPicker {
   position: absolute;
-  top: 130%;
+  top: 120%;
   left: 0;
 }
 
@@ -162,7 +163,7 @@
   cursor: pointer;
 }
 
-.orientations .selected,
-.sizes .selected {
+.orientation.selected,
+.size.selected {
   background-color: white;
 }
