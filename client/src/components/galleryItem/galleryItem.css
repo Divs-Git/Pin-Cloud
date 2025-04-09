@@ -10,7 +10,7 @@
 }
 
 .overlay,
-.saveBtn,
+.saveButton,
 .overlayIcons {
   display: none;
 }
@@ -26,12 +26,12 @@
   border-radius: 16px;
 }
 
-.galleryItem:hover .saveBtn {
+.galleryItem:hover .saveButton {
   display: block;
-  background-color: #e50828;
+  background-color: #e50829;
   color: white;
-  padding: 12px 16px;
   border-radius: 24px;
+  padding: 12px 16px;
   font-weight: 500;
   cursor: pointer;
   width: max-content;
@@ -47,6 +47,7 @@
   bottom: 16px;
   right: 16px;
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
