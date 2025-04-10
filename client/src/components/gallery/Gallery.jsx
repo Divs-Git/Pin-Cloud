@@ -2,7 +2,7 @@ import GalleryItem from '../galleryItem/GalleryItem';
 import './gallery.css';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Skeleton from '../skeleton/skeleton';
+import Skeleton from '../skeleton/Skeleton';
 import axiosInstance from '../../api';
 
 const fetchPins = async ({ pageParam, search, userId, boardId }) => {
