@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import Image from '../image/Image';
-import UserButton from '../userButton/UserButton';
 import './topBar.css';
+import UserButton from '../userButton/UserButton';
 
 const TopBar = () => {
   const navigate = useNavigate();
@@ -11,16 +11,15 @@ const TopBar = () => {
     navigate(`/search?search=${e.target[0].value}`);
   };
   return (
-    <form onSubmit={handleSubmit} className='topBar'>
-      {/*Search*/}
-      <div className='search'>
-        <Image path='/general/search.svg' alt='search' />
-        <input type='text' placeholder='Search...' />
-      </div>
-
-      {/*User*/}
+    <div className='topBar'>
+      {/* SEARCH */}
+      <form onSubmit={handleSubmit} className='search'>
+        <Image path='/general/search.svg' alt='' />
+        <input type='text' placeholder='Search' />
+      </form>
+      {/* USER */}
       <UserButton />
-    </form>
+    </div>
   );
 };
 

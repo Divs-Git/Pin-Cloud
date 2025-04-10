@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import Image from '../../components/image/Image';
 import './auth.css';
-import axios from '../../api';
 import { useNavigate } from 'react-router';
-import useAuthStore from '../../store/authStore';
+import useAuthStore from '../../stores/authStore';
+import Image from '../../components/image/Image';
+import axiosInstance from '../../api';
 
 const Auth = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -15,31 +15,30 @@ const Auth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const formData = new FormData(e.target);
 
     const data = Object.fromEntries(formData);
 
     try {
-      const response = await axios.post(
+      const res = await axiosInstance.post(
         `/users/auth/${isRegister ? 'register' : 'login'}`,
         data
       );
 
-      setCurrentUser(response.data);
+      setCurrentUser(res.data);
 
       navigate('/');
-    } catch (error) {
-      setError(error.response.data.message);
+    } catch (err) {
+      setError(err.response.data.message);
     }
   };
   return (
-    <div className='auth'>
+    <div className='authPage'>
       <div className='authContainer'>
-        <Image path={'/general/logo.png'} alt={''} w={36} h={36} />
-        <h1> {isRegister ? 'Create an account' : 'Login to your account'} </h1>
+        <Image path='/general/logo.png' w={36} h={36} alt='' />
+        <h1>{isRegister ? 'Create an Account' : 'Login to your account'}</h1>
         {isRegister ? (
-          <form key={'registerForm'} onSubmit={handleSubmit}>
+          <form key='register' onSubmit={handleSubmit}>
             <div className='formGroup'>
               <label htmlFor='username'>Username</label>
               <input
@@ -50,18 +49,16 @@ const Auth = () => {
                 id='username'
               />
             </div>
-
             <div className='formGroup'>
-              <label htmlFor='displayName'>Display Name</label>
+              <label htmlFor='displayName'>Name</label>
               <input
                 type='displayName'
-                placeholder='Display Name'
+                placeholder='Name'
                 required
                 name='displayName'
                 id='displayName'
               />
             </div>
-
             <div className='formGroup'>
               <label htmlFor='email'>Email</label>
               <input
@@ -72,7 +69,6 @@ const Auth = () => {
                 id='email'
               />
             </div>
-
             <div className='formGroup'>
               <label htmlFor='password'>Password</label>
               <input
@@ -83,15 +79,14 @@ const Auth = () => {
                 id='password'
               />
             </div>
-
             <button type='submit'>Register</button>
             <p onClick={() => setIsRegister(false)}>
-              Already a member? <b>Login</b>
+              Do you have an account? <b>Login</b>
             </p>
             {error && <p className='error'>{error}</p>}
           </form>
         ) : (
-          <form key={'loginForm'} onSubmit={handleSubmit}>
+          <form key='loginForm' onSubmit={handleSubmit}>
             <div className='formGroup'>
               <label htmlFor='email'>Email</label>
               <input
@@ -102,7 +97,6 @@ const Auth = () => {
                 id='email'
               />
             </div>
-
             <div className='formGroup'>
               <label htmlFor='password'>Password</label>
               <input
@@ -113,7 +107,6 @@ const Auth = () => {
                 id='password'
               />
             </div>
-
             <button type='submit'>Login</button>
             <p onClick={() => setIsRegister(true)}>
               Don&apos;t have an account? <b>Register</b>

@@ -1,4 +1,4 @@
-.auth {
+.authPage{
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -6,7 +6,7 @@
   justify-content: center;
 }
 
-.authContainer {
+.authContainer{
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,37 +14,37 @@
   gap: 32px;
   padding: 32px;
   border-radius: 32px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
 }
 
-.authContainer h1 {
+.authContainer h1{
   font-weight: 400;
 }
 
-.authContainer form {
+.authContainer form{
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.formGroup {
+.formGroup{
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.formGroup label {
+.formGroup label{
   font-size: 14px;
 }
 
-.formGroup input {
+.formGroup input{
   padding: 16px;
   border: 2px solid #e0e0e0;
   border-radius: 16px;
 }
 
-.authContainer button {
+.authContainer button{
   background-color: #e50829;
   padding: 16px;
   border: none;
@@ -60,6 +60,6 @@
   cursor: pointer;
 }
 
-.error {
-  color: red;
+.error{
+  color: #e50829;
 }

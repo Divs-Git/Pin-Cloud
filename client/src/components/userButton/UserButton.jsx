@@ -1,39 +1,39 @@
 import { useState } from 'react';
-import './userbutton.css';
-import Image from '../image/Image';
-import axios from '../../api';
+import './userButton.css';
 import { Link, useNavigate } from 'react-router';
-import useAuthStore from '../../store/authStore';
+import useAuthStore from '../../stores/authStore';
+import axiosInstance from '../../api';
+import Image from '../image/Image';
 
 const UserButton = () => {
-  const { currentUser, removeCurrentUser } = useAuthStore();
-
   const [open, setOpen] = useState(false);
+
   const navigate = useNavigate();
+
+  const { currentUser, removeCurrentUser } = useAuthStore();
 
   const handleLogout = async () => {
     try {
-      await axios.post('/users/auth/logout');
+      await axiosInstance.post('/users/auth/logout', {});
       removeCurrentUser();
       navigate('/auth');
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   return currentUser ? (
     <div className='userButton'>
-      <Image path={currentUser.image || '/general/noAvatar.png'} />
+      <Image path={currentUser.img || '/general/noAvatar.png'} alt='' />
       <div onClick={() => setOpen((prev) => !prev)}>
-        <Image path='/general/arrow.svg' className='arrow' />
+        <Image path='/general/arrow.svg' alt='' className='arrow' />
       </div>
-
       {open && (
         <div className='userOptions'>
           <Link to={`/${currentUser.username}`} className='userOption'>
             Profile
           </Link>
-          <div className='userOption'>Settings</div>
+          <div className='userOption'>Setting</div>
           <div className='userOption' onClick={handleLogout}>
             Logout
           </div>
