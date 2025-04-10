@@ -1,4 +1,4 @@
-import Gallery from '../../components/gallery/gallery';
+import Gallery from '../../components/gallery/Gallery';
 import './home.css';
 
 const Homepage = () => {

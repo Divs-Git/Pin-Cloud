@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '../../api';
 import Image from '../../components/image/Image';
 import FollowButton from './../userProfile/FollowButton';
-import Gallery from '../../components/gallery/gallery';
+import Gallery from '../../components/gallery/Gallery';
 import Boards from './../../components/boards/Board';
 
 const ProfilePage = () => {
